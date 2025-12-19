@@ -1,5 +1,28 @@
 <template>
   <div class="note">
+    <btn
+      @click="
+        () => {
+          const calculatedStock = calculatedStocks[processedNum - 1]?.value
+          if (!calculatedStock) {
+            return
+          }
+          // @ts-expect-error
+          stock[
+            (
+              {
+                bonus: 'oricalcite',
+                skill: 'tarredDevice',
+              } as const
+            )[mode]
+          ] = calculatedStock
+          processedNum = 0
+        }
+      "
+      class="confirm"
+    >
+      在庫確定
+    </btn>
     <btn @click="columns = []" class="reset">リセット</btn>
 
     <div class="stock">
@@ -71,8 +94,20 @@
           +
         </btn>
 
-        <div class="cell calculated-stock" v-for="i in rowNum">
-          {{ calculatedStocks[i - 1] }}
+        <div class="cell" v-for="i in rowNum">
+          <input
+            type="checkbox"
+            :checked="i <= processedNum"
+            @change="
+              (e) => {
+                processedNum =
+                  i +
+                  // @ts-expect-error
+                  (e.target?.checked ? 0 : -1)
+              }
+            "
+          />
+          <span>{{ calculatedStocks[i - 1]?.label }}</span>
         </div>
       </div>
       <div
@@ -195,6 +230,9 @@ const stock = defineModel<Stock>('stock', {
     tarredDevice: {},
   },
 })
+const processedNum = defineModel<number>('processedNum', {
+  default: 0,
+})
 
 const rowNum = computed(
   () =>
@@ -207,12 +245,13 @@ const rowNum = computed(
       )[props.mode]
     ].length ?? 0
 )
+
 const calculatedStocks = computed(() => {
   if (props.mode === 'bonus') {
     return Array(rowNum.value)
       .fill(null)
-      .map((_, i) => stock.value.oricalcite - 20 * i)
-      .map((v) => `${v + 20}->${v}`)
+      .map((_, i) => stock.value.oricalcite - 20 * (i + 1))
+      .map((v) => ({ value: v, label: `${v + 20}->${v}` }))
   } else if (props.mode === 'skill') {
     const s = { ...stock.value.tarredDevice }
     const css = []
@@ -221,13 +260,12 @@ const calculatedStocks = computed(() => {
       const focusType = column?.weapon.focusType ?? '会心'
       s[focusType] ??= s[focusType] ?? 0
       s[focusType] -= 3
-      css.push({ [focusType]: `${s[focusType] + 3}->${s[focusType]}` })
+      css.push({
+        value: { ...s },
+        label: `${focusType}:${s[focusType] + 3}->${s[focusType]}`,
+      })
     }
-    return css.map((s) =>
-      Object.entries(s)
-        .map(([key, value]) => `${key[0]}:${value}`)
-        .join(' ')
-    )
+    return css
   }
   return []
 })
@@ -318,7 +356,7 @@ export type Stock = {
         width: var(--cell-width);
 
         display: flex;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
 
         border: solid 1px var(--c-border);
@@ -331,7 +369,7 @@ export type Stock = {
           display: flex;
           justify-content: center;
           align-items: center;
-          > input[type="radio"] {
+          > input[type='radio'] {
             margin: 0 4px;
           }
         }

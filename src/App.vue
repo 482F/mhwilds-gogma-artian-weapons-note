@@ -11,15 +11,17 @@
     >
       <template v-slot:bonus-note>
         <note
-          v-model:columns="bonusColumns"
+          v-model:columns="bonus.columns"
           v-model:stock="stock"
+          v-model:processed-num="bonus.processedNum"
           mode="bonus"
         />
       </template>
       <template v-slot:skill-note>
         <note
-          v-model:columns="skillColumns"
+          v-model:columns="skill.columns"
           v-model:stock="stock"
+          v-model:processed-num="skill.processedNum"
           mode="skill"
         />
       </template>
@@ -38,8 +40,17 @@ import Setting from './feature/setting/component.vue'
 
 import Tabs from './component/tabs/component.vue'
 
-const bonusColumns = useLocalStorage<Column[]>('bonus-columns', [])
-const skillColumns = useLocalStorage<Column[]>('skill-columns', [])
+const bonus = useLocalStorage<{
+  columns: Column[]
+  processedNum: number
+}>('bonus', { columns: [], processedNum: 0 })
+const skill = useLocalStorage<{
+  columns: Column[]
+  processedNum: number
+}>('skill', {
+  columns: [],
+  processedNum: 0,
+})
 const stock = useLocalStorage<Stock>('stock', {
   oricalcite: 0,
   tarredDevice: {},
