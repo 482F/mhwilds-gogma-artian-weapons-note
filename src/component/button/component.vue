@@ -8,6 +8,7 @@
 
 <style scoped>
 .button {
+  font-size: 1rem;
   border: solid 1px var(--c-border);
   background-color: white;
   &:hover {

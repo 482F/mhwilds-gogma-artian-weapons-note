@@ -2,8 +2,46 @@
   <div class="skill-note">
     <btn @click="columns = []" class="reset">リセット</btn>
 
+    <div class="stock">
+      在庫
+      <div v-if="mode === 'bonus'" class="oricalcite">
+        <label>
+          ナナイロカネ:
+          <text-field
+            :model-value="String(stock.oricalcite)"
+            @update:model-value="
+              (v) => {
+                const num = Number(v)
+                if (Number.isNaN(num)) {
+                  return
+                }
+                stock.oricalcite = num
+              }
+            "
+          />
+        </label>
+      </div>
+      <div v-if="mode === 'skill'" class="tarred-device">
+        <label v-for="focusType of weaponDef.focusTypes">
+          {{ focusType }}:
+          <text-field
+            :model-value="String(stock.tarredDevice[focusType] ?? 0)"
+            @update:model-value="
+              (v) => {
+                const num = Number(v)
+                if (Number.isNaN(num)) {
+                  return
+                }
+                stock.tarredDevice[focusType] = num
+              }
+            "
+          />
+        </label>
+      </div>
+    </div>
+
     <div class="table">
-      <div class="column">
+      <div class="column first">
         <btn
           class="cell"
           @click="
@@ -13,13 +51,15 @@
                 Math.max(1, ...columns.map(({ bonuses }) => bonuses.length))
               )
                 .fill(null)
-                .map(() => [
-                  undefined,
-                  undefined,
-                  undefined,
-                  undefined,
-                  undefined,
-                ]),
+                .map(() => ({
+                  values: [
+                    undefined,
+                    undefined,
+                    undefined,
+                    undefined,
+                    undefined,
+                  ],
+                })),
               skills: Array(
                 Math.max(1, ...columns.map(({ skills }) => skills.length))
               )
@@ -30,6 +70,10 @@
         >
           +
         </btn>
+
+        <div class="cell calculated-stock" v-for="i in rowNum">
+          {{ calculatedStocks[i - 1] }}
+        </div>
       </div>
       <div
         class="column"
@@ -49,7 +93,40 @@
             :items="weaponDef.focusTypes"
           />
         </div>
-        <div v-if="mode === 'skill'" class="cell skill" v-for="skill of skills">
+        <div
+          v-if="mode === 'skill'"
+          :class="{
+            cell: true,
+            skill: true,
+            selected: skill.selected,
+          }"
+          v-for="(skill, j) of skills"
+        >
+          <label>
+            <input
+              type="radio"
+              :checked="skill.selected"
+              @change="
+                () =>
+                  columns.forEach((column, k) => {
+                    const skill = column.skills[j]
+                    if (!skill) {
+                      return
+                    }
+                    skill.selected = k === i
+                  })
+              "
+            />
+            <div
+              v-for="tdStock of [
+                weapon.focusType
+                  ? stock.tarredDevice[weapon.focusType]
+                  : undefined,
+              ].filter((v) => v != null)"
+            >
+              {{ tdStock - 3 * j }}->{{ tdStock - 3 * (j + 1) }}
+            </div>
+          </label>
           <slc
             v-model="skill.series"
             :class="{
@@ -66,20 +143,22 @@
               group: true,
               lose: skill.group === 'はずれ',
             }"
+            @click="fillSkill(skill)"
+            @focus="fillSkill(skill)"
             :items="weaponDef.groupSkills"
           />
         </div>
         <div
           v-else-if="mode === 'bonus'"
           class="cell bonus"
-          v-for="bonus of bonuses"
+          v-for="(bonus, i) of bonuses"
         >
           <slc
-            v-for="(_, i) in bonus"
-            v-model="bonus[i]"
+            v-for="(_, i) in bonus.values"
+            v-model="bonus.values[i]"
             :class="{
               series: true,
-              lose: bonus[i] === 'はずれ',
+              lose: bonus.values[i] === 'はずれ',
             }"
             :items="weaponDef.bonuses"
             @click="fillBonus(bonus)"
@@ -92,8 +171,9 @@
 </template>
 
 <script lang="ts" setup>
-import { watch } from 'vue'
+import { computed, watch } from 'vue'
 
+import TextField from '../../component/text-field/component.vue'
 import Slc from '../../component/select/component.vue'
 import Btn from '../../component/button/component.vue'
 
@@ -101,12 +181,55 @@ import { type Weapon, useWeaponDef } from '../../composable/weapon-defs-usable'
 
 const weaponDef = useWeaponDef()
 
-defineProps<{
+const props = defineProps<{
   mode: 'skill' | 'bonus'
 }>()
 
 const columns = defineModel<Column[]>('columns', {
   default: [],
+})
+
+const stock = defineModel<Stock>('stock', {
+  default: {
+    oricalcite: 0,
+    tarredDevice: {},
+  },
+})
+
+const rowNum = computed(
+  () =>
+    columns.value[0]?.[
+      (
+        {
+          bonus: 'bonuses',
+          skill: 'skills',
+        } as const
+      )[props.mode]
+    ].length ?? 0
+)
+const calculatedStocks = computed(() => {
+  if (props.mode === 'bonus') {
+    return Array(rowNum.value)
+      .fill(null)
+      .map((_, i) => stock.value.oricalcite - 20 * i)
+      .map((v) => `${v + 20}->${v}`)
+  } else if (props.mode === 'skill') {
+    const s = { ...stock.value.tarredDevice }
+    const css = []
+    for (let i = 0; i < rowNum.value; i++) {
+      const column = columns.value.find(({ skills }) => skills[i]?.selected)
+      const focusType = column?.weapon.focusType ?? '会心'
+      s[focusType] ??= s[focusType] ?? 0
+      s[focusType] -= 3
+      css.push({ [focusType]: `${s[focusType] + 3}->${s[focusType]}` })
+    }
+    return css.map((s) =>
+      Object.entries(s)
+        .map(([key, value]) => `${key[0]}:${value}`)
+        .join(' ')
+    )
+  }
+  return []
 })
 
 watch(
@@ -126,20 +249,16 @@ watch(
 watch(
   () =>
     columns.value.some((column) =>
-      column.bonuses[column.bonuses.length - 1]?.some((v) => Boolean(v))
+      column.bonuses[column.bonuses.length - 1]?.values.some((v) => Boolean(v))
     ),
   (nv) => {
     if (!nv) {
       return
     }
     columns.value.forEach((column) =>
-      column.bonuses.push([
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-      ])
+      column.bonuses.push({
+        values: [undefined, undefined, undefined, undefined, undefined],
+      })
     )
   }
 )
@@ -152,8 +271,8 @@ function fillSkill(skill: (typeof columns)['value'][number]['skills'][number]) {
 function fillBonus(
   bonus: (typeof columns)['value'][number]['bonuses'][number]
 ) {
-  bonus.forEach((_, i) => {
-    bonus[i] ??= 'はずれ'
+  bonus.values.forEach((_, i) => {
+    bonus.values[i] ??= 'はずれ'
   })
 }
 </script>
@@ -166,20 +285,34 @@ export type Column = {
     focusType?: Weapon['focusTypes']
   }
   skills: {
+    selected?: boolean
     series?: Weapon['seriesSkills']
     group?: Weapon['groupSkills']
   }[]
-  bonuses: ((Weapon['bonuses'] | undefined)[] & { length: 5 })[]
+  bonuses: {
+    values: (Weapon['bonuses'] | undefined)[]
+  }[]
+}
+
+export type Stock = {
+  tarredDevice: { [focusType in Weapon['focusTypes']]?: number }
+  oricalcite: number
 }
 </script>
 
 <style scoped>
 .skill-note {
   --cell-height: 2rem;
-  --cell-width: v-bind('({ bonus: "21rem", skill: "16.3rem" }[mode])');
+  --cell-width: v-bind('({ bonus: "20.8rem", skill: "22.5rem" }[mode])');
   > .table {
     display: flex;
     > .column {
+      &.first {
+        > .cell {
+          width: 100%;
+          padding: 0 1rem;
+        }
+      }
       > .cell {
         height: var(--cell-height);
         width: var(--cell-width);
@@ -193,6 +326,15 @@ export type Column = {
           width: 3rem;
         }
 
+        label {
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          > input[type="radio"] {
+            margin: 0 4px;
+          }
+        }
         select {
           border: none;
           height: 100%;
@@ -212,6 +354,9 @@ export type Column = {
           }
         }
         &.skill {
+          &.selected {
+            background-color: var(--c-active-bg);
+          }
           .series {
             flex-grow: 1;
           }
