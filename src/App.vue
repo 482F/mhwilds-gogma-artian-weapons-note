@@ -14,17 +14,18 @@ import HelloWorld from './components/HelloWorld.vue'
   <HelloWorld msg="Vite + Vue" />
 </template>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+* {
+  font-family: 'Cica';
+  &::-webkit-scrollbar-track {
+    background-color: #eee;
+  }
+  &::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: #777;
+    border-radius: 30px;
+  }
 }
 </style>
