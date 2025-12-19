@@ -193,6 +193,7 @@
         :key="i"
       >
         <div class="cell weapon">
+          <btn @click="() => columns.splice(i, 1)" class="delete">x</btn>
           <slc v-model="weapon.kind" class="kind" :items="weaponDef.kinds" />
           <slc
             v-model="weapon.element"
@@ -541,6 +542,11 @@ export type FavoriteSkills = {
           }
         }
         &.weapon {
+          > .delete {
+            height: 100%;
+            width: 2rem;
+            border: none;
+          }
           > .kind {
             flex-grow: 1;
           }
