@@ -1,14 +1,7 @@
 <template>
   <div class="app">
     <div class="header">mhwilds 巨戟アーティアメモ</div>
-    <tabs
-      class="tabs"
-      :tabs="[
-        { key: 'bonus-note', label: '巨戟復元強化' },
-        { key: 'skill-note', label: 'スキルの再付与' },
-        { key: 'setting', label: '設定' },
-      ]"
-    >
+    <tabs class="tabs" v-model:current-key="currentTab" :tabs="tabDefs">
       <template v-slot:bonus-note>
         <note
           v-model:columns="bonus.columns"
@@ -40,6 +33,15 @@ import Setting from './feature/setting/component.vue'
 
 import Tabs from './component/tabs/component.vue'
 
+const tabDefs = [
+  { key: 'bonus-note', label: '巨戟復元強化' },
+  { key: 'skill-note', label: 'スキルの再付与' },
+  { key: 'setting', label: '設定' },
+] as const
+const currentTab = useLocalStorage<(typeof tabDefs)[number]['key']>(
+  'current-tab',
+  'bonus-note'
+)
 const bonus = useLocalStorage<{
   columns: Column[]
   processedNum: number
