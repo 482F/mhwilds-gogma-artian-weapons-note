@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "deno task build && git wa gh-page || true; dir=.git/worktree-dir/gh-page; rsync -a dist/ $dir && cd $dir && git a . && git zco -m deploy || true; git pushsu"
   },
   "dependencies": {
     "es-toolkit": "^1.43.0",
