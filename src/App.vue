@@ -9,6 +9,7 @@
           v-model:processed-num="bonus.processedNum"
           v-model:favorite-skills="favoriteSkills"
           mode="bonus"
+          class="content"
         />
       </template>
       <template v-slot:skill-note>
@@ -18,6 +19,7 @@
           v-model:processed-num="skill.processedNum"
           v-model:favorite-skills="favoriteSkills"
           mode="skill"
+          class="content"
         />
       </template>
     </tabs>
@@ -76,7 +78,7 @@ const favoriteSkills = useLocalStorage<FavoriteSkills>('favorite-skills', {
   display: grid;
   grid-template-areas:
     'header'
-    'content';
+    'tabs';
   grid-template-rows: max-content 1fr;
   > * {
     min-width: 0;
@@ -87,8 +89,11 @@ const favoriteSkills = useLocalStorage<FavoriteSkills>('favorite-skills', {
     grid-area: header;
     font-size: 32px;
   }
-  > .content {
-    grid-area: content;
+  > .tabs {
+    grid-area: tabs;
+    .content {
+      margin-top: 8px;
+    }
   }
 }
 </style>

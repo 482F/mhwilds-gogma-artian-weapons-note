@@ -1,32 +1,43 @@
 <template>
   <div class="note">
-    <btn
-      @click="
-        () => {
-          const calculatedStock = calculatedStocks[processedNum - 1]?.value
-          if (!calculatedStock) {
-            return
+    <div class="buttons">
+      <btn
+        @click="
+          () => {
+            const calculatedStock = calculatedStocks[processedNum - 1]?.value
+            if (!calculatedStock) {
+              return
+            }
+            // @ts-expect-error
+            stock[
+              (
+                {
+                  bonus: 'oricalcite',
+                  skill: 'tarredDevice',
+                } as const
+              )[mode]
+            ] = calculatedStock
+            columns.forEach((column) => {
+              column.bonuses.splice(0, processedNum)
+              column.skills.splice(0, processedNum)
+            })
+            processedNum = 0
           }
-          // @ts-expect-error
-          stock[
-            (
-              {
-                bonus: 'oricalcite',
-                skill: 'tarredDevice',
-              } as const
-            )[mode]
-          ] = calculatedStock
-          processedNum = 0
-        }
-      "
-      class="confirm"
-    >
-      在庫確定
-    </btn>
-    <btn @click="columns = []" class="reset">リセット</btn>
+        "
+        class="confirm"
+      >
+        在庫確定
+      </btn>
+      <btn @click="columns = []" class="reset">リセット</btn>
+    </div>
 
-    <div class="stock">
-      在庫
+    <fieldset class="stock">
+      <legend>
+        {{
+          // @ts-expect-error
+          { skill: '油濁した遺装置' }[mode] ?? ''
+        }}在庫
+      </legend>
       <div v-if="mode === 'bonus'" class="oricalcite">
         <label>
           ナナイロカネ:
@@ -61,9 +72,9 @@
           />
         </label>
       </div>
-    </div>
+    </fieldset>
 
-    <details class="favorite-skills">
+    <details class="favorite-skills" v-if="mode === 'skill'">
       <summary>お気に入りスキル設定</summary>
       <div class="settings">
         <div
@@ -154,24 +165,31 @@
             ),
           }"
         >
-          <input
-            type="checkbox"
-            :checked="i <= processedNum"
-            @change="
-              (e) => {
-                processedNum =
-                  i +
-                  // @ts-expect-error
-                  (e.target?.checked ? 0 : -1)
-              }
-            "
-          />
-          <span>{{ calculatedStocks[i - 1]?.label }}</span>
+          <label>
+            <input
+              type="checkbox"
+              :checked="i <= processedNum"
+              @change="
+                (e) => {
+                  processedNum =
+                    i +
+                    // @ts-expect-error
+                    (e.target?.checked ? 0 : -1)
+                }
+              "
+            />
+            <span>{{ calculatedStocks[i - 1]?.label }}</span>
+          </label>
         </div>
       </div>
       <div
-        class="column"
         v-for="({ weapon, skills, bonuses }, i) of columns"
+        :class="{
+          'column': true,
+          'selected-column':
+            bonuses.some(({ selected }) => selected) ||
+            skills.some(({ selected }) => selected),
+        }"
         :key="i"
       >
         <div class="cell weapon">
@@ -439,6 +457,26 @@ export type FavoriteSkills = {
 
 <style scoped>
 .note {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  > * {
+    width: fit-content;
+  }
+
+  > .buttons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    > button {
+      height: 2.3rem;
+      padding: 0 1rem;
+    }
+  }
+  > fieldset.stock {
+    border: solid 1px var(--c-border);
+  }
   > details.favorite-skills {
     > .settings {
       display: flex;
@@ -454,6 +492,11 @@ export type FavoriteSkills = {
   > .table {
     display: flex;
     > .column {
+      &.selected-column {
+        > .cell.weapon {
+          background-color: var(--c-active-bg);
+        }
+      }
       &.first {
         position: sticky;
         left: 0;
