@@ -145,11 +145,14 @@
         </btn>
 
         <div
+          v-for="i in rowNum"
           :class="{
             'cell': true,
-            'selected-row': columns.some(({ skills }) => skills[i]?.selected),
+            'selected-row': columns.some(
+              ({ bonuses, skills }) =>
+                bonuses[i - 1]?.selected || skills[i - 1]?.selected
+            ),
           }"
-          v-for="i in rowNum"
         >
           <input
             type="checkbox"
@@ -186,9 +189,29 @@
         </div>
         <div
           v-if="mode === 'bonus'"
-          class="cell bonus"
-          v-for="bonus of bonuses"
+          :class="{
+            cell: true,
+            bonus: true,
+            selected: bonus.selected,
+          }"
+          v-for="(bonus, j) of bonuses"
         >
+          <label>
+            <input
+              type="radio"
+              :checked="bonus.selected"
+              @change="
+                () =>
+                  columns.forEach((column, k) => {
+                    const bonus = column.bonuses[j]
+                    if (!bonus) {
+                      return
+                    }
+                    bonus.selected = k === i
+                  })
+              "
+            />
+          </label>
           <slc
             v-for="(_, i) in bonus.values"
             v-model="bonus.values[i]"
@@ -394,6 +417,7 @@ export type Column = {
     focusType?: Weapon['focusTypes']
   }
   bonuses: {
+    selected?: boolean
     values: (Weapon['bonuses'] | undefined)[]
   }[]
   skills: {
@@ -426,7 +450,7 @@ export type FavoriteSkills = {
   }
 
   --cell-height: 2rem;
-  --cell-width: v-bind('({ bonus: "20.8rem", skill: "20.5rem" }[mode])');
+  --cell-width: v-bind('({ bonus: "22.7rem", skill: "20.5rem" }[mode])');
   > .table {
     display: flex;
     > .column {
@@ -485,6 +509,9 @@ export type FavoriteSkills = {
           }
         }
         &.bonus {
+          > label {
+            width: 3rem;
+          }
           > * {
             width: 20%;
           }
