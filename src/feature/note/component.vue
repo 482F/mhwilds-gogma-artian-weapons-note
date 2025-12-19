@@ -144,7 +144,13 @@
           +
         </btn>
 
-        <div class="cell" v-for="i in rowNum">
+        <div
+          :class="{
+            'cell': true,
+            'selected-row': columns.some(({ skills }) => skills[i]?.selected),
+          }"
+          v-for="i in rowNum"
+        >
           <input
             type="checkbox"
             :checked="i <= processedNum"
@@ -431,6 +437,9 @@ export type FavoriteSkills = {
           min-width: max-content;
           width: 100%;
           padding: 0 1rem;
+          &.selected-row {
+            background-color: var(--c-active-bg);
+          }
         }
       }
       > .cell {
