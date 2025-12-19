@@ -317,7 +317,12 @@ const calculatedStocks = computed(() => {
     const css = []
     for (let i = 0; i < rowNum.value; i++) {
       const column = columns.value.find(({ skills }) => skills[i]?.selected)
-      const focusType = column?.weapon.focusType ?? '会心'
+      const focusType =
+        column?.weapon.focusType ??
+        (['会心', '属性', '攻撃'] as const).find(
+          (type) => 3 <= (s[type] ?? 0)
+        ) ??
+        '会心'
       s[focusType] ??= s[focusType] ?? 0
       s[focusType] -= 3
       css.push({
