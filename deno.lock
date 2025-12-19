@@ -4,6 +4,7 @@
     "npm:@types/node@^24.10.1": "24.10.4",
     "npm:@vitejs/plugin-vue@^6.0.1": "6.0.3_vite@7.3.0__@types+node@24.10.4__picomatch@4.0.3_vue@3.5.26__typescript@5.9.3_@types+node@24.10.4_typescript@5.9.3",
     "npm:@vue/tsconfig@~0.8.1": "0.8.1_typescript@5.9.3_vue@3.5.26__typescript@5.9.3",
+    "npm:es-toolkit@^1.43.0": "1.43.0",
     "npm:typescript@~5.9.3": "5.9.3",
     "npm:vite@^7.2.4": "7.3.0_@types+node@24.10.4_picomatch@4.0.3",
     "npm:vue-tsc@^3.1.4": "3.2.1_typescript@5.9.3",
@@ -413,6 +414,9 @@
     "entities@7.0.0": {
       "integrity": "sha512-FDWG5cmEYf2Z00IkYRhbFrwIwvdFKH07uV8dvNy0omp/Qb1xcyCWp2UDtcwJF4QZZvk0sLudP6/hAu42TaqVhQ=="
     },
+    "es-toolkit@1.43.0": {
+      "integrity": "sha512-SKCT8AsWvYzBBuUqMk4NPwFlSdqLpJwmy6AP322ERn8W2YLIB6JBXnwMI2Qsh2gfphT3q7EKAxKb23cvFHFwKA=="
+    },
     "esbuild@0.27.2": {
       "integrity": "sha512-HyNQImnsOC7X9PMNaCIeAm4ISCQXs5a5YasTXVliKv4uuBo1dKrG0A+uQS8M5eXjVMnLg3WgXaKvprHlFJQffw==",
       "optionalDependencies": [
@@ -594,6 +598,7 @@
         "npm:@types/node@^24.10.1",
         "npm:@vitejs/plugin-vue@^6.0.1",
         "npm:@vue/tsconfig@~0.8.1",
+        "npm:es-toolkit@^1.43.0",
         "npm:typescript@~5.9.3",
         "npm:vite@^7.2.4",
         "npm:vue-tsc@^3.1.4",
