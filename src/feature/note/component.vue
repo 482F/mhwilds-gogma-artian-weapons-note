@@ -63,6 +63,56 @@
       </div>
     </div>
 
+    <details class="favorite-skills">
+      <summary>お気に入りスキル設定</summary>
+      <div class="settings">
+        <div
+          v-for="{ fsKey, wdKey } of [
+            { fsKey: 'series', wdKey: 'seriesSkills' },
+            { fsKey: 'group', wdKey: 'groupSkills' },
+          ] as const"
+          :key="fsKey"
+          :class="fsKey"
+        >
+          <label v-for="skill of weaponDef[wdKey]">
+            <input
+              type="checkbox"
+              :checked="
+                favoriteSkillSets[fsKey].has(
+                  // @ts-expect-error
+                  skill
+                )
+              "
+              @change="
+                (e) => {
+                  const {
+                    // @ts-expect-error
+                    checked,
+                  } = e.target ?? {}
+                  const exists = favoriteSkillSets[fsKey].has(
+                    // @ts-expect-error
+                    skill
+                  )
+                  if (checked && !exists) {
+                    favoriteSkills[fsKey].push(
+                      // @ts-expect-error
+                      skill
+                    )
+                  } else if (!checked && exists) {
+                    // @ts-expect-error
+                    favoriteSkills[fsKey] = favoriteSkills[fsKey].filter(
+                      (s) => s !== skill
+                    )
+                  }
+                }
+              "
+            />
+            {{ skill }}
+          </label>
+        </div>
+      </div>
+    </details>
+
     <div class="table">
       <div class="column first">
         <btn
@@ -188,6 +238,7 @@
             @click="fillSkill(skill)"
             @focus="fillSkill(skill)"
             :items="weaponDef.seriesSkills"
+            :fav-item-set="favoriteSkillSets.series"
           />
           <slc
             v-model="skill.group"
@@ -198,6 +249,7 @@
             @click="fillSkill(skill)"
             @focus="fillSkill(skill)"
             :items="weaponDef.groupSkills"
+            :fav-item-set="favoriteSkillSets.group"
           />
         </div>
       </div>
@@ -233,6 +285,14 @@ const stock = defineModel<Stock>('stock', {
 const processedNum = defineModel<number>('processedNum', {
   default: 0,
 })
+
+const favoriteSkills = defineModel<FavoriteSkills>('favoriteSkills', {
+  default: { series: [], group: [] },
+})
+const favoriteSkillSets = computed(() => ({
+  series: new Set(favoriteSkills.value.series),
+  group: new Set(favoriteSkills.value.group),
+}))
 
 const rowNum = computed(
   () =>
@@ -336,10 +396,24 @@ export type Stock = {
   tarredDevice: { [focusType in Weapon['focusTypes']]?: number }
   oricalcite: number
 }
+export type FavoriteSkills = {
+  series: Weapon['seriesSkills'][]
+  group: Weapon['groupSkills'][]
+}
 </script>
 
 <style scoped>
 .note {
+  > details.favorite-skills {
+    > .settings {
+      display: flex;
+      > div {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  }
+
   --cell-height: 2rem;
   --cell-width: v-bind('({ bonus: "20.8rem", skill: "22.5rem" }[mode])');
   > .table {

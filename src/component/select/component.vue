@@ -2,13 +2,24 @@
   <select class="select" v-model="modelValue">
     <option :value="undefined"></option>
     <hr />
-    <option v-for="value of items" :value :key="value">{{ value }}</option>
+    <template
+      v-for="filteredItems of [
+        items.filter((item) => favItemSet?.has(item)),
+        items.filter((item) => !favItemSet?.has(item)),
+      ]"
+    >
+      <option v-for="value of filteredItems" :value :key="value">
+        {{ value }}
+      </option>
+      <hr />
+    </template>
   </select>
 </template>
 
 <script lang="ts" setup generic="T extends string">
 defineProps<{
   items: readonly T[]
+  favItemSet?: Set<T>
 }>()
 const modelValue = defineModel<T | undefined>({
   default: undefined,

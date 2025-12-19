@@ -7,6 +7,7 @@
           v-model:columns="bonus.columns"
           v-model:stock="stock"
           v-model:processed-num="bonus.processedNum"
+          v-model:favorite-skills="favoriteSkills"
           mode="bonus"
         />
       </template>
@@ -15,6 +16,7 @@
           v-model:columns="skill.columns"
           v-model:stock="stock"
           v-model:processed-num="skill.processedNum"
+          v-model:favorite-skills="favoriteSkills"
           mode="skill"
         />
       </template>
@@ -28,7 +30,11 @@
 <script setup lang="ts">
 import { useLocalStorage } from './composable/local-storage-usable'
 
-import Note, { type Column, type Stock } from './feature/note/component.vue'
+import Note, {
+  type Column,
+  type Stock,
+  type FavoriteSkills,
+} from './feature/note/component.vue'
 import Setting from './feature/setting/component.vue'
 
 import Tabs from './component/tabs/component.vue'
@@ -56,6 +62,10 @@ const skill = useLocalStorage<{
 const stock = useLocalStorage<Stock>('stock', {
   oricalcite: 0,
   tarredDevice: {},
+})
+const favoriteSkills = useLocalStorage<FavoriteSkills>('favorite-skills', {
+  series: [],
+  group: [],
 })
 </script>
 
