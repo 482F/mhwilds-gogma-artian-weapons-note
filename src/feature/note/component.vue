@@ -215,10 +215,17 @@
           'selected-column':
             bonuses.some(({ selected }) => selected) ||
             skills.some(({ selected }) => selected),
+          'shrinked': shrinkedColumnNumObj[i],
         }"
         :key="i"
       >
         <div class="cell weapon">
+          <btn
+            @click="() => (shrinkedColumnNumObj[i] = !shrinkedColumnNumObj[i])"
+            class="shrink"
+          >
+            {{ shrinkedColumnNumObj[i] ? '>' : '<' }}
+          </btn>
           <btn @click="() => columns.splice(i, 1)" class="delete">x</btn>
           <slc v-model="weapon.kind" class="kind" :items="weaponDef.kinds" />
           <slc
@@ -338,7 +345,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 import TextField from '../../component/text-field/component.vue'
 import Slc from '../../component/select/component.vue'
@@ -385,6 +392,7 @@ const rowNum = computed(
       )[props.mode]
     ].length ?? 0
 )
+const shrinkedColumnNumObj = ref<{ [key in number]: boolean }>({})
 
 const calculatedStocks = computed(() => {
   if (props.mode === 'bonus') {
@@ -536,6 +544,9 @@ export type FavoriteSkills = {
           background-color: var(--c-active-bg);
         }
       }
+      &.shrinked {
+        max-width: 2rem;
+      }
       &.first {
         position: sticky;
         left: 0;
@@ -587,7 +598,8 @@ export type FavoriteSkills = {
         &.weapon {
           position: sticky;
           top: 0;
-          > .delete {
+          > .shrink,
+          .delete {
             height: 100%;
             width: 2rem;
             border: none;
