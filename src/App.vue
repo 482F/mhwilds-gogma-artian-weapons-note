@@ -20,9 +20,6 @@
           mode="skill"
         />
       </template>
-      <template v-slot:setting>
-        <setting />
-      </template>
     </tabs>
   </div>
 </template>
@@ -35,14 +32,12 @@ import Note, {
   type Stock,
   type FavoriteSkills,
 } from './feature/note/component.vue'
-import Setting from './feature/setting/component.vue'
 
 import Tabs from './component/tabs/component.vue'
 
 const tabDefs = [
   { key: 'bonus-note', label: '巨戟復元強化' },
   { key: 'skill-note', label: 'スキルの再付与' },
-  { key: 'setting', label: '設定' },
 ] as const
 const currentTab = useLocalStorage<(typeof tabDefs)[number]['key']>(
   'current-tab',
