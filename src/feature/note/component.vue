@@ -94,7 +94,24 @@
           />
         </div>
         <div
-          v-if="mode === 'skill'"
+          v-if="mode === 'bonus'"
+          class="cell bonus"
+          v-for="bonus of bonuses"
+        >
+          <slc
+            v-for="(_, i) in bonus.values"
+            v-model="bonus.values[i]"
+            :class="{
+              series: true,
+              lose: bonus.values[i] === 'はずれ',
+            }"
+            :items="weaponDef.bonuses"
+            @click="fillBonus(bonus)"
+            @focus="fillBonus(bonus)"
+          />
+        </div>
+        <div
+          v-else-if="mode === 'skill'"
           :class="{
             cell: true,
             skill: true,
@@ -148,23 +165,6 @@
             :items="weaponDef.groupSkills"
           />
         </div>
-        <div
-          v-else-if="mode === 'bonus'"
-          class="cell bonus"
-          v-for="(bonus, i) of bonuses"
-        >
-          <slc
-            v-for="(_, i) in bonus.values"
-            v-model="bonus.values[i]"
-            :class="{
-              series: true,
-              lose: bonus.values[i] === 'はずれ',
-            }"
-            :items="weaponDef.bonuses"
-            @click="fillBonus(bonus)"
-            @focus="fillBonus(bonus)"
-          />
-        </div>
       </div>
     </div>
   </div>
@@ -182,7 +182,7 @@ import { type Weapon, useWeaponDef } from '../../composable/weapon-defs-usable'
 const weaponDef = useWeaponDef()
 
 const props = defineProps<{
-  mode: 'skill' | 'bonus'
+  mode: 'bonus' | 'skill'
 }>()
 
 const columns = defineModel<Column[]>('columns', {
@@ -234,20 +234,6 @@ const calculatedStocks = computed(() => {
 
 watch(
   () =>
-    columns.value.some((column) => {
-      const { series, group } = column.skills[column.skills.length - 1] ?? {}
-      return series || group
-    }),
-  (nv) => {
-    if (!nv) {
-      return
-    }
-    columns.value.forEach((column) => column.skills.push({}))
-  }
-)
-
-watch(
-  () =>
     columns.value.some((column) =>
       column.bonuses[column.bonuses.length - 1]?.values.some((v) => Boolean(v))
     ),
@@ -263,10 +249,19 @@ watch(
   }
 )
 
-function fillSkill(skill: (typeof columns)['value'][number]['skills'][number]) {
-  skill.group ??= 'はずれ'
-  skill.series ??= 'はずれ'
-}
+watch(
+  () =>
+    columns.value.some((column) => {
+      const { series, group } = column.skills[column.skills.length - 1] ?? {}
+      return series || group
+    }),
+  (nv) => {
+    if (!nv) {
+      return
+    }
+    columns.value.forEach((column) => column.skills.push({}))
+  }
+)
 
 function fillBonus(
   bonus: (typeof columns)['value'][number]['bonuses'][number]
@@ -274,6 +269,11 @@ function fillBonus(
   bonus.values.forEach((_, i) => {
     bonus.values[i] ??= 'はずれ'
   })
+}
+
+function fillSkill(skill: (typeof columns)['value'][number]['skills'][number]) {
+  skill.group ??= 'はずれ'
+  skill.series ??= 'はずれ'
 }
 </script>
 
@@ -284,13 +284,13 @@ export type Column = {
     element?: Weapon['elements']
     focusType?: Weapon['focusTypes']
   }
+  bonuses: {
+    values: (Weapon['bonuses'] | undefined)[]
+  }[]
   skills: {
     selected?: boolean
     series?: Weapon['seriesSkills']
     group?: Weapon['groupSkills']
-  }[]
-  bonuses: {
-    values: (Weapon['bonuses'] | undefined)[]
   }[]
 }
 
@@ -353,6 +353,11 @@ export type Stock = {
             width: 3.3rem;
           }
         }
+        &.bonus {
+          > * {
+            width: 20%;
+          }
+        }
         &.skill {
           &.selected {
             background-color: var(--c-active-bg);
@@ -362,11 +367,6 @@ export type Stock = {
           }
           .group {
             min-width: 7rem;
-          }
-        }
-        &.bonus {
-          > * {
-            width: 20%;
           }
         }
       }
