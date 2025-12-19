@@ -243,10 +243,15 @@
         >
           <label>
             <input
-              type="radio"
+              type="checkbox"
               :checked="bonus.selected"
               @change="
-                () =>
+                (e) => {
+                  // @ts-expect-error
+                  const v: boolean = e.target.value
+                  if (!v) {
+                    return
+                  }
                   columns.forEach((column, k) => {
                     const bonus = column.bonuses[j]
                     if (!bonus) {
@@ -254,6 +259,7 @@
                     }
                     bonus.selected = k === i
                   })
+                }
               "
             />
           </label>
@@ -279,17 +285,20 @@
         >
           <label>
             <input
-              type="radio"
+              type="checkbox"
               :checked="skill.selected"
               @change="
-                () =>
+                (e) => {
+                  // @ts-expect-error
+                  const v: boolean = e.target.checked
                   columns.forEach((column, k) => {
                     const skill = column.skills[j]
                     if (!skill) {
                       return
                     }
-                    skill.selected = k === i
+                    skill.selected = v && k === i
                   })
+                }
               "
             />
             <div
@@ -564,7 +573,7 @@ export type FavoriteSkills = {
           display: flex;
           justify-content: center;
           align-items: center;
-          > input[type='radio'] {
+          > input[type='checkbox'] {
             margin: 0 4px;
           }
         }
