@@ -178,7 +178,33 @@
                 }
               "
             />
-            <span>{{ calculatedStocks[i - 1]?.label }}</span>
+            <span>
+              {{ calculatedStocks[i - 1]?.label }}
+              {{
+                (() => {
+                  const selectedColumn = columns.find(
+                    ({ bonuses, skills }) =>
+                      bonuses[i - 1]?.selected || skills[i - 1]?.selected
+                  )
+                  if (!selectedColumn) {
+                    return ''
+                  }
+                  const [weapon, bonus, skill] = [
+                    selectedColumn.weapon,
+                    selectedColumn.bonuses[i - 1],
+                    selectedColumn.skills[i - 1],
+                  ] as const
+
+                  const weaponLabel = `${weapon.kind} ${weapon.element} ${weapon.focusType}`
+                  if (mode === 'bonus') {
+                    return `${weaponLabel} ${bonus?.values.join(' ') ?? ''}`
+                  } else if (mode === 'skill') {
+                    return `${weaponLabel} ${skill?.series ?? ''} ${skill?.group ?? ''}`
+                  }
+                  return ''
+                })()
+              }}
+            </span>
           </label>
         </div>
       </div>
@@ -510,6 +536,11 @@ export type FavoriteSkills = {
           padding: 0 1rem;
           &.selected-row {
             background-color: var(--c-active-bg);
+          }
+          > label {
+            width: 100%;
+            display: flex;
+            justify-content: flex-start;
           }
         }
       }
