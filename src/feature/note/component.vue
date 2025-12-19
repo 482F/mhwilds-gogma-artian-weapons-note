@@ -239,8 +239,7 @@
               lose: bonus.values[i] === 'はずれ',
             }"
             :items="weaponDef.bonuses"
-            @click="fillBonus(bonus)"
-            @focus="fillBonus(bonus)"
+            @mousedown="fillBonus(bonus)"
           />
         </div>
         <div
@@ -283,8 +282,7 @@
               series: true,
               lose: skill.series === 'はずれ',
             }"
-            @click="fillSkill(skill)"
-            @focus="fillSkill(skill)"
+            @mousedown="fillSkill(skill)"
             :items="weaponDef.seriesSkills"
             :fav-item-set="favoriteSkillSets.series"
           />
@@ -294,8 +292,7 @@
               group: true,
               lose: skill.group === 'はずれ',
             }"
-            @click="fillSkill(skill)"
-            @focus="fillSkill(skill)"
+            @mousedown="fillSkill(skill)"
             :items="weaponDef.groupSkills"
             :fav-item-set="favoriteSkillSets.group"
           />
@@ -417,12 +414,18 @@ watch(
 function fillBonus(
   bonus: (typeof columns)['value'][number]['bonuses'][number]
 ) {
+  if (bonus.values.some((v) => v != null)) {
+    return
+  }
   bonus.values.forEach((_, i) => {
     bonus.values[i] ??= 'はずれ'
   })
 }
 
 function fillSkill(skill: (typeof columns)['value'][number]['skills'][number]) {
+  if ([skill.group, skill.series].some((v) => v != null)) {
+    return
+  }
   skill.group ??= 'はずれ'
   skill.series ??= 'はずれ'
 }
