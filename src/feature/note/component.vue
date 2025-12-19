@@ -420,12 +420,17 @@ export type FavoriteSkills = {
     display: flex;
     > .column {
       &.first {
+        position: sticky;
+        left: 0;
         > .cell {
+          min-width: max-content;
           width: 100%;
           padding: 0 1rem;
         }
       }
       > .cell {
+        background-color: white;
+
         height: var(--cell-height);
         width: var(--cell-width);
 
@@ -459,7 +464,7 @@ export type FavoriteSkills = {
             flex-grow: 1;
           }
           > .element {
-            width: 2rem;
+            width: 3rem;
           }
           > .focusType {
             width: 3.3rem;

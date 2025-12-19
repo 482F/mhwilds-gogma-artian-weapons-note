@@ -75,7 +75,6 @@ const favoriteSkills = useLocalStorage<FavoriteSkills>('favorite-skills', {
   padding: 2% 5%;
   width: 100%;
   height: 100%;
-  overflow: auto;
 
   background-color: white;
 
@@ -84,6 +83,9 @@ const favoriteSkills = useLocalStorage<FavoriteSkills>('favorite-skills', {
     'header'
     'content';
   grid-template-rows: max-content 1fr;
+  > * {
+    min-width: 0;
+  }
   gap: 32px;
 
   > .header {
