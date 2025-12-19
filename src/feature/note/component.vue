@@ -1,5 +1,5 @@
 <template>
-  <div class="skill-note">
+  <div class="note">
     <btn @click="columns = []" class="reset">リセット</btn>
 
     <div class="stock">
@@ -301,7 +301,7 @@ export type Stock = {
 </script>
 
 <style scoped>
-.skill-note {
+.note {
   --cell-height: 2rem;
   --cell-width: v-bind('({ bonus: "20.8rem", skill: "22.5rem" }[mode])');
   > .table {
