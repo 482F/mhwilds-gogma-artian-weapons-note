@@ -10,10 +10,10 @@
       ]"
     >
       <template v-slot:bonus-note>
-        <note />
+        <note v-model:columns="bonusColumns" mode="bonus" />
       </template>
       <template v-slot:skill-note>
-        <note />
+        <note v-model:columns="skillColumns" mode="skill" />
       </template>
       <template v-slot:setting>
         <setting />
@@ -23,10 +23,15 @@
 </template>
 
 <script setup lang="ts">
-import Note from './feature/note/component.vue'
+import { useLocalStorage } from './composable/local-storage-usable'
+
+import Note, { type Column } from './feature/note/component.vue'
 import Setting from './feature/setting/component.vue'
 
 import Tabs from './component/tabs/component.vue'
+
+const bonusColumns = useLocalStorage<Column[]>('bonus-columns', [])
+const skillColumns = useLocalStorage<Column[]>('skill-columns', [])
 </script>
 
 <style scoped>
