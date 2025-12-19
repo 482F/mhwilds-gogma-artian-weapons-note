@@ -226,7 +226,7 @@
                   : undefined,
               ].filter((v) => v != null)"
             >
-              {{ tdStock - 3 * j }}->{{ tdStock - 3 * (j + 1) }}
+              ->{{ tdStock - 3 * (j + 1) }}
             </div>
           </label>
           <slc
@@ -311,7 +311,7 @@ const calculatedStocks = computed(() => {
     return Array(rowNum.value)
       .fill(null)
       .map((_, i) => stock.value.oricalcite - 20 * (i + 1))
-      .map((v) => ({ value: v, label: `${v + 20}->${v}` }))
+      .map((v) => ({ value: v, label: `->${v}` }))
   } else if (props.mode === 'skill') {
     const s = { ...stock.value.tarredDevice }
     const css = []
@@ -322,7 +322,7 @@ const calculatedStocks = computed(() => {
       s[focusType] -= 3
       css.push({
         value: { ...s },
-        label: `${focusType}:${s[focusType] + 3}->${s[focusType]}`,
+        label: `${focusType}:->${s[focusType]}`,
       })
     }
     return css
@@ -415,7 +415,7 @@ export type FavoriteSkills = {
   }
 
   --cell-height: 2rem;
-  --cell-width: v-bind('({ bonus: "20.8rem", skill: "22.5rem" }[mode])');
+  --cell-width: v-bind('({ bonus: "20.8rem", skill: "20.5rem" }[mode])');
   > .table {
     display: flex;
     > .column {
