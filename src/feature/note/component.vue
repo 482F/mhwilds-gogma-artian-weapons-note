@@ -545,6 +545,8 @@ export type FavoriteSkills = {
           }
         }
         &.weapon {
+          position: sticky;
+          top: 0;
           > .delete {
             height: 100%;
             width: 2rem;
